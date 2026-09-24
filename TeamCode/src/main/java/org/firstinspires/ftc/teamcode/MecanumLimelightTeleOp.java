@@ -2,16 +2,20 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "Mecanum + Advanced Limelight Assist")
 public class MecanumLimelightTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // Initialize independent subsystems
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(hardwareMap);
         LimelightSubsystem limelight = new LimelightSubsystem(hardwareMap);
+        ShooterSubsystem shooterSystem = new ShooterSubsystem(hardwareMap);
 
         telemetry.addData("Status", "Ready for Game Elements");
         telemetry.update();
@@ -19,8 +23,7 @@ public class MecanumLimelightTeleOp extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            // Standard driver controls
-            //can change later to tune
+            // Drivetrain translation
             double forward = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double turn = gamepad1.right_stick_x;
@@ -28,28 +31,29 @@ public class MecanumLimelightTeleOp extends LinearOpMode {
             // Strategy 1: Driver Assist "Snap-to-Target" (Hold A)
             if (gamepad1.a && limelight.hasTarget()) {
                 double tx = limelight.getTargetXOffset();
-                // Proportional loop to steer toward the target horizontally
                 turn = tx * 0.03;
             }
 
             // Strategy 2: Distance Approach Assist (Hold B)
-            // Useful if you want the robot to automatically inch closer or back up to a target height
             if (gamepad1.b && limelight.hasTarget()) {
                 double ty = limelight.getTargetYOffset();
-
-                // Let's say your ideal target vertical offset is 5.0 degrees.
-                // If ty is less than 5, drive forward; if more, back up.
                 double targetTy = 5.0;
                 double error = ty - targetTy;
-
-                // Override the forward stick input with our vision correction
                 forward = error * 0.05;
             }
 
-            // Send calculated inputs to the drive subsystem
+            // Handle the shooter, indexer, and intake macros via the subsystem loop
+            shooterSystem.update(
+                    gamepad1.right_bumper,   // Boolean macro trigger/ have to hold
+                    gamepad1.right_trigger,  // Manual intake
+                    gamepad1.left_trigger    // Manual outtake
+            );
+
+            // Execute hardware movement for drivetrain
             drive.drive(forward, strafe, turn);
 
-            // Telemetry to help you tune your multipliers on the fly
+            // Diagnostics telemetry
+            telemetry.addData("Shooter Macro State", shooterSystem.getStateName());
             telemetry.addData("Has Target", limelight.hasTarget());
             telemetry.addData("Target X (tx)", limelight.getTargetXOffset());
             telemetry.addData("Target Y (ty)", limelight.getTargetYOffset());
