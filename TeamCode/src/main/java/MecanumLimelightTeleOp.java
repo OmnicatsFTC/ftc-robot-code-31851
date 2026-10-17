@@ -49,9 +49,9 @@ public class MecanumLimelightTeleOp extends LinearOpMode {
 
             // Diagnostics telemetry
             telemetry.addData("Shooter Macro State", shooterSystem.getStateName());
-//            telemetry.addData("Has Target", limelight.hasTarget());
-//            telemetry.addData("Target X (tx)", limelight.getTargetXOffset());
-//            telemetry.addData("Target Y (ty)", limelight.getTargetYOffset());
+            telemetry.addData("Has Target", limelight.hasTarget());
+            telemetry.addData("Target X (tx)", limelight.getTargetXOffset());
+            telemetry.addData("Target Y (ty)", limelight.getTargetYOffset());
             telemetry.update();
         }
     }
