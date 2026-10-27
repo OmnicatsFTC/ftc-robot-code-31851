@@ -22,8 +22,8 @@ public class MecanumLimelightTeleOp extends LinearOpMode {
 
         while (opModeIsActive()) {
             // Drivetrain translation
-            double forward = gamepad1.left_stick_x;
-            double strafe = -gamepad1.left_stick_y;
+            double forward = -gamepad1.left_stick_y;
+            double strafe = gamepad1.left_stick_x;
             double turn = gamepad1.right_stick_x;
 
             // Strategy 1: Driver Assist "Snap-to-Target" (Hold A)
@@ -41,9 +41,11 @@ public class MecanumLimelightTeleOp extends LinearOpMode {
             }
 
             // Handle the shooter, indexer, and intake macros via the subsystem loop
-            shooterSystem.updateShooter(gamepad1.left_bumper);          // press A to toggle flywheel on/off
-            shooterSystem.updateIndexer(gamepad1.right_bumper); // press bumper to fire
-            shooterSystem.updateIntake(gamepad1.right_trigger, gamepad1.left_trigger);
+            shooterSystem.updateShooter(gamepad1.b);          // press A to toggle flywheel on/off
+            shooterSystem.updateIndexer(gamepad1.a); // press bumper to fire
+//            shooterSystem.updateIntake(gamepad1.right_trigger, gamepad1.left_trigger);
+            shooterSystem.updateIntake(gamepad1.left_trigger,gamepad1.right_trigger);
+            shooterSystem.updateIntake2(gamepad1.x);
             // Execute hardware movement for drivetrain
             drive.drive(forward, strafe, turn);
 
